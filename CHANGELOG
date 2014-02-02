@@ -2,5 +2,6 @@
 
    v0.1 - Birthday
         - Solve a bug when no parameter were given
+        - Conflit with 2 options in argparse
 
 **

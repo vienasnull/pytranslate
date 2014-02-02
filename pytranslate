@@ -50,8 +50,8 @@ def get_arguments():
                                    with google translate")
     args.add_argument('text', type=str, nargs='+',
                       help="One or many word(s) to translate")
-    args.add_argument('-s', '--source', help="Language source")
-    args.add_argument('-t', '--target', help="Language target")
+    args.add_argument('-f', '--from', help="From language")
+    args.add_argument('-t', '--to', help="To language")
     args.add_argument('-s', '--show', action="store_true", help="Print \
                       supported languages")
 
@@ -80,17 +80,17 @@ def translate(*args, **kwargs):
         print('No word or text to translate !')
         sys.exit(2)
 
-    if not 'source' in kwargs or kwargs['source'] is None:
+    if not 'from' in kwargs or kwargs['from'] is None:
         print('No source language to translate')
         sys.exit(2)
 
-    if not 'target' in kwargs or kwargs['target'] is None:
+    if not 'to' in kwargs or kwargs['to'] is None:
         print('No target language to translate')
         sys.exit(2)
 
     text = ' '.join(kwargs['text'])
-    src = kwargs['source']
-    target = kwargs['target']
+    src = kwargs['from']
+    target = kwargs['to']
 
     if not src in LANGUAGE_DICT:
         print('Unknown language: {0}'.format(src))
