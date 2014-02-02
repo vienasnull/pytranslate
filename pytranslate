@@ -1,0 +1,115 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+
+"""Translate one or many word(s) with google translate."""
+
+
+import argparse
+import requests
+import sys
+from bs4 import BeautifulSoup
+
+LANGUAGE_DICT = {"af": "Afrikaans", "sq": "Albanais", "de": "Allemand",
+                 "en": "Anglais", "ar": "Arabe", "hy": "Arménien",
+                 "az": "Azéri", "eu": "Basque", "bn": "Bengali",
+                 "be": "Biélorusse", "bs": "Bosniaque", "bg": "Bulgare",
+                 "ca": "Catalan", "ceb": "Cebuano",
+                 "zh-CN": "Chinois (simplifié)",
+                 "zh-TW": "Chinois (traditionnel)", "ko": "Coréen",
+                 "ht": "Créole haïtien", "hr": "Croate", "da": "Danois",
+                 "es": "Espagnol", "eo": "Espéranto", "et": "Estonien",
+                 "fi": "Finnois", "fr": "Français", "gl": "Galicien",
+                 "cy": "Gallois", "ka": "Géorgien", "el": "Grec",
+                 "gu": "Gujarati", "ha": "Haoussa", "iw": "Hébreu",
+                 "hi": "Hindi", "hmn": "Hmong", "hu": "Hongrois", "ig": "Igbo",
+                 "id": "Indonésien", "ga": "Irlandais", "is": "Islandais",
+                 "it": "Italien", "ja": "Japonais", "jw": "Javanais",
+                 "kn": "Kannada", "km": "Khmer", "lo": "Laotien",
+                 "la": "Latin", "lv": "Letton", "lt": "Lituanien",
+                 "mk": "Macédonien", "ms": "Malaisien", "mt": "Maltais",
+                 "mi": "Maori", "mr": "Marathi", "mn": "Mongol",
+                 "nl": "Néerlandais", "ne": "Népalais", "no": "Norvégien",
+                 "pa": "Panjabi", "fa": "Persan", "pl": "Polonais",
+                 "pt": "Portugais", "ro": "Roumain", "ru": "Russe",
+                 "sr": "Serbe", "sk": "Slovaque", "sl": "Slovène",
+                 "so": "Somali", "sv": "Suédois", "sw": "Swahili",
+                 "tl": "Tagalog", "ta": "Tamoul", "cs": "Tchèque",
+                 "te": "Telugu", "th": "Thaï", "tr": "Turc", "uk": "Ukrainien",
+                 "ur": "Urdu", "vi": "Vietnamien", "yi": "Yiddish",
+                 "yo": "Yorouba", "zu": "Zoulou"}
+
+
+def get_arguments():
+    """Handling arguments using argparse.
+    It return an argparse object
+
+    """
+
+    args = argparse.ArgumentParser(description="Translate one or many word(s) \
+                                   with google translate")
+    args.add_argument('text', type=str, nargs='+',
+                      help="One or many word(s) to translate")
+    args.add_argument('-s', '--source', help="Language source")
+    args.add_argument('-t', '--target', help="Language target")
+    args.add_argument('-s', '--show', action="store_true", help="Print \
+                      supported languages")
+
+    return args.parse_args()
+
+
+def show():
+    """It show supported languages."""
+
+    if not('--show' in sys.argv or '-s' in sys.argv):
+        return
+
+    for l, k in LANGUAGE_DICT.items():
+        print("{1}: \"{0}\"".format(l, k))
+
+    sys.exit()
+
+
+def translate(*args, **kwargs):
+    """Translate word(s)."""
+
+    if not 'text' in kwargs or kwargs['text'] is None:
+        print('No word or text to translate !')
+        sys.exit(2)
+
+    if not 'source' in kwargs or kwargs['source'] is None:
+        print('No source language to translate')
+        sys.exit(2)
+
+    if not 'target' in kwargs or kwargs['target'] is None:
+        print('No target language to translate')
+        sys.exit(2)
+
+    text = ' '.join(kwargs['text'])
+    src = kwargs['source']
+    target = kwargs['target']
+
+    if not src in LANGUAGE_DICT:
+        print('Unknown language: {0}'.format(src))
+        sys.exit(2)
+
+    if not target in LANGUAGE_DICT:
+        print('Unknown language: {0}'.format(target))
+        sys.exit(2)
+
+    playload = {'sl': src, 'hl': target, 'q': text}
+    r = requests.get('https://translate.google.com/', params=playload)
+    soup = BeautifulSoup(r.content)
+
+    for child in soup.find(id='result_box'):
+        print(child.contents[0])
+
+
+def main():
+    show()
+    opts = vars(get_arguments())
+    translate(**opts)
+
+
+if __name__ == "__main__":
+    main()
