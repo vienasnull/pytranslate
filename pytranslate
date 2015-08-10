@@ -102,7 +102,7 @@ def translate(*args, **kwargs):
 
     playload = {'sl': src, 'hl': target, 'q': text}
     r = requests.get('https://translate.google.com/', params=playload)
-    soup = BeautifulSoup(r.content)
+    soup = BeautifulSoup(r.content, "html.parser")
 
     for child in soup.find(id='result_box'):
         print(child.contents[0])
